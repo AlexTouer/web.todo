@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список задач</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+        .btn-primary { background-color: #007bff; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-danger { background-color: red; }
+        .btn-danger:hover { background-color: darkred; }
+        .btn-success { background-color: green; }
+        .btn-success:hover { background-color: darkgreen; }
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        .task-list li {
+            background: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-list .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    {% if user.is_authenticated %}
+        <p>Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
+        <p> <a href="{% url 'home' %}" class="btn btn-primary">Главная страница</a> <p/>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Выйти</button>
+        </form>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+        <a href="{% url 'register' %}" class="btn btn-success">Регистрация</a>
+    {% endif %}
+
+    <h1>Список задач</h1>
+    <a href="{% url 'task_create' %}" class="btn btn-primary">+ Добавить задачу</a>
+
+    <ul class="task-list">
+        {% for task in tasks %}
+            <li class="{% if task.completed %}completed{% endif %}">
+                <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+                <div class="actions">
+                    {% if not task.completed %}
+                        <a href="{% url 'task_complete' task.pk %}" class="btn btn-success">✔</a>
+                    {% endif %}
+                    <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger">✖</a>
+
+                </div>
+
+            </li>
+        {% empty %}
+            <li>Нет задач</li>
+        {% endfor %}
+    </ul>
+</div>
+
+</body>
+</html>
